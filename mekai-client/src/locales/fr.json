@@ -1,0 +1,21 @@
+{
+  "header_sub": "Diagnostic intelligent pour votre véhicule",
+  "problem_label": "Décrivez votre problème",
+  "problem_placeholder": "Ex: Ma voiture fait un bruit étrange au démarrage et fume un peu...",
+  "photo_label": "Ajouter une photo (optionnel)",
+  "photo_added": "Photo ajoutée",
+  "diagnose_btn": "Diagnostiquer",
+  "loading": "Analyse en cours...",
+  "difficulty_easy": "Facile",
+  "difficulty_medium": "Moyen",
+  "difficulty_hard": "Mécanicien requis",
+  "diagnosis_title": "Diagnostic",
+  "steps_title": "Étapes à suivre",
+  "next_step_title": "Si vous êtes bloqué",
+  "followup_placeholder": "Bloqué sur une étape ? Posez votre question...",
+  "send_btn": "Envoyer",
+  "new_diagnosis": "Nouveau diagnostic",
+  "error_empty": "Veuillez décrire votre problème.",
+  "error_network": "Erreur de connexion. Vérifiez votre réseau.",
+  "history_title": "Historique"
+}

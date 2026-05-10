@@ -1,0 +1,21 @@
+{
+  "header_sub": "تشخيص ذكي لمشاكل سيارتك",
+  "problem_label": "اوصف المشكلة",
+  "problem_placeholder": "مثال: سيارتي تصدر صوت غريب عند التشغيل وتدخن قليلاً...",
+  "photo_label": "أضف صورة (اختياري)",
+  "photo_added": "تمت إضافة الصورة",
+  "diagnose_btn": "ابدأ التشخيص",
+  "loading": "جاري التحليل...",
+  "difficulty_easy": "سهل",
+  "difficulty_medium": "متوسط",
+  "difficulty_hard": "ميكانيكي مطلوب",
+  "diagnosis_title": "التشخيص",
+  "steps_title": "خطوات الحل",
+  "next_step_title": "إذا واجهتك صعوبة",
+  "followup_placeholder": "واجهت صعوبة؟ اسأل هنا...",
+  "send_btn": "إرسال",
+  "new_diagnosis": "تشخيص جديد",
+  "error_empty": "يرجى وصف المشكلة.",
+  "error_network": "خطأ في الاتصال. تحقق من الإنترنت.",
+  "history_title": "السجل"
+}

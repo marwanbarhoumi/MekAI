@@ -1,0 +1,21 @@
+{
+  "header_sub": "Smart vehicle problem diagnosis",
+  "problem_label": "Describe your problem",
+  "problem_placeholder": "Ex: My car makes a strange noise when starting and smokes a bit...",
+  "photo_label": "Add a photo (optional)",
+  "photo_added": "Photo added",
+  "diagnose_btn": "Diagnose",
+  "loading": "Analyzing...",
+  "difficulty_easy": "Easy",
+  "difficulty_medium": "Medium",
+  "difficulty_hard": "Mechanic required",
+  "diagnosis_title": "Diagnosis",
+  "steps_title": "Steps to follow",
+  "next_step_title": "If you get stuck",
+  "followup_placeholder": "Stuck on a step? Ask here...",
+  "send_btn": "Send",
+  "new_diagnosis": "New diagnosis",
+  "error_empty": "Please describe your problem.",
+  "error_network": "Connection error. Check your network.",
+  "history_title": "History"
+}
