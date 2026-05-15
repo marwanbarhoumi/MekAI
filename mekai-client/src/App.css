@@ -301,3 +301,25 @@ textarea:focus { border-color: #e85d26; }
 }
 
 .reset-btn:hover { border-color: #555; color: #ccc; }
+
+/* ===== Auth Page ===== */
+.auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; background: #0f0f0f; }
+.auth-card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 20px; padding: 2rem; width: 100%; max-width: 400px; }
+.auth-logo { font-size: 36px; text-align: center; margin-bottom: 0.5rem; }
+.auth-title { font-size: 22px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 1.5rem; }
+.auth-field { margin-bottom: 1rem; }
+.auth-field label { display: block; font-size: 13px; color: #888; margin-bottom: 6px; font-weight: 500; }
+.auth-field input { width: 100%; background: #111; border: 1px solid #2a2a2a; border-radius: 10px; color: #f0f0f0; font-family: inherit; font-size: 14px; padding: 10px 12px; outline: none; transition: border-color 0.15s; }
+.auth-field input:focus { border-color: #e85d26; }
+.auth-error { color: #f87171; font-size: 13px; margin-bottom: 0.75rem; text-align: center; }
+.auth-btn { width: 100%; padding: 12px; background: #e85d26; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; transition: background 0.15s; }
+.auth-btn:hover { background: #c94e1e; }
+.auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.auth-switch { width: 100%; background: transparent; border: none; color: #e85d26; font-size: 13px; cursor: pointer; margin-top: 1rem; text-align: center; }
+.auth-switch:hover { text-decoration: underline; }
+.user-pill { display: flex; align-items: center; gap: 8px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 20px; padding: 5px 12px; font-size: 13px; color: #ccc; }
+.logout-btn { background: transparent; border: none; color: #666; cursor: pointer; font-size: 12px; padding: 0; }
+.logout-btn:hover { color: #f87171; }
+.login-header-btn { background: #e85d26; color: #fff; border: none; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.login-header-btn:hover { background: #c94e1e; }
+.splash { min-height: 100vh; display: flex; align-items: center; justify-content: center; font-size: 40px; background: #0f0f0f; }

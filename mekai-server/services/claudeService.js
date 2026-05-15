@@ -19,7 +19,7 @@ FORMAT OBLIGATOIRE :
 difficulty: easy=réparable seul, medium=un peu d'expérience, hard=mécanicien pro requis`;
 
 const diagnose = async ({ problem, lang = 'fr', imageBase64, mimeType }) => {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   const prompt = SYSTEM_PROMPT(lang) + '\n\nProblème: ' + problem;
   const parts = [{ text: prompt }];
   if (imageBase64) {
@@ -32,7 +32,7 @@ const diagnose = async ({ problem, lang = 'fr', imageBase64, mimeType }) => {
 };
 
 const followUp = async ({ question, lang = 'fr', originalProblem, previousResult }) => {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   const prompt = `Tu es MekAI, mécanicien expert. Réponds en ${LANG_LABEL[lang] || 'français'}.
 Problème original: "${originalProblem}"
 Diagnostic: ${JSON.stringify(previousResult)}
