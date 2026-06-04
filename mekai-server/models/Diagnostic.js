@@ -19,6 +19,7 @@ const diagnosticSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
   }],
 
+  rating: { type: String, enum: ['up', 'down'], default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Diagnostic', diagnosticSchema);

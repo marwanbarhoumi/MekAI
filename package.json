@@ -1,0 +1,26 @@
+{
+  "name": "mekai",
+  "version": "1.0.0",
+  "description": "> Assistant IA multilingue (AR / FR / EN) qui diagnostique les pannes de voiture, moto et camion — avec photo et conversation step-by-step.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix mekai-server\" \"npm run dev --prefix mekai-client\"",
+    "server": "npm run dev --prefix mekai-server",
+    "client": "npm run dev --prefix mekai-client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marwanbarhoumi/MekAI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/marwanbarhoumi/MekAI/issues"
+  },
+  "homepage": "https://github.com/marwanbarhoumi/MekAI#readme",
+  "dependencies": {
+    "concurrently": "^10.0.3"
+  }
+}

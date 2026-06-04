@@ -4,93 +4,74 @@ const { upload, uploadToCloudinary } = require('../middleware/upload');
 const claudeService = require('../services/claudeService');
 const Diagnostic = require('../models/Diagnostic');
 
-/**
- * POST /api/diagnose
- * Body: multipart/form-data
- *   - problem (string, required)
- *   - lang    (string: fr|ar|en, default: fr)
- *   - image   (file, optional)
- */
-router.post('/', upload.single('image'), async (req, res, next) => {
+// POST /api/diagnose — supporte jusqu'à 4 photos
+router.post('/', upload.array('images', 4), async (req, res, next) => {
   try {
     const { problem, lang = 'fr', userId = 'anonymous' } = req.body;
-
-    if (!problem || !problem.trim()) {
+    if (!problem?.trim())
       return res.status(400).json({ success: false, error: 'Le champ "problem" est requis.' });
-    }
 
-    // Upload image sur Cloudinary si présente
-    let imageUrl = null;
+    // Upload toutes les images sur Cloudinary
+    let imageUrls = [];
     let imageBase64 = null;
-    const mimeType = req.file?.mimetype || null;
+    let mimeType = null;
 
-    if (req.file) {
-      imageUrl    = await uploadToCloudinary(req.file.buffer, mimeType);
-      imageBase64 = req.file.buffer.toString('base64');
+    if (req.files?.length > 0) {
+      imageUrls = await Promise.all(
+        req.files.map(f => uploadToCloudinary(f.buffer, f.mimetype))
+      );
+      // On envoie la première image à l'IA
+      imageBase64 = req.files[0].buffer.toString('base64');
+      mimeType = req.files[0].mimetype;
     }
 
-    // Appel Claude
     const result = await claudeService.diagnose({
-      problem: problem.trim(),
-      lang,
-      imageBase64,
-      mimeType,
+      problem: problem.trim(), lang, imageBase64, mimeType,
     });
 
-    // Sauvegarde en base
-    const doc = await Diagnostic.create({
-      userId,
-      lang,
-      problem: problem.trim(),
-      imageUrl,
-      ...result,
-    });
+    // Essayer de sauvegarder dans MongoDB, mais continuer si ça échoue
+    let doc;
+    try {
+      doc = await Diagnostic.create({
+        userId, lang,
+        problem: problem.trim(),
+        imageUrl: imageUrls[0] || null,
+        imageUrls,
+        ...result,
+      });
+    } catch (dbErr) {
+      console.warn('⚠️  Could not save to database:', dbErr.message);
+      // Créer un faux ID pour la réponse
+      doc = { _id: 'temp-' + Date.now() };
+    }
 
     res.status(201).json({
       success: true,
-      data: { id: doc._id, ...result, imageUrl },
+      data: { id: doc._id, ...result, imageUrl: imageUrls[0] || null, imageUrls },
     });
-  } catch (err) {
-    next(err);
-  }
+  } catch (err) { next(err); }
 });
 
-/**
- * POST /api/diagnose/:id/followup
- * Body JSON: { question, lang }
- */
+// POST /api/diagnose/:id/followup
 router.post('/:id/followup', async (req, res, next) => {
   try {
     const { question, lang = 'fr' } = req.body;
-
-    if (!question || !question.trim()) {
+    if (!question?.trim())
       return res.status(400).json({ success: false, error: 'Le champ "question" est requis.' });
-    }
 
     const doc = await Diagnostic.findById(req.params.id);
-    if (!doc) {
-      return res.status(404).json({ success: false, error: 'Diagnostic introuvable.' });
-    }
+    if (!doc) return res.status(404).json({ success: false, error: 'Diagnostic introuvable.' });
 
     const answer = await claudeService.followUp({
-      question: question.trim(),
-      lang,
+      question: question.trim(), lang,
       originalProblem: doc.problem,
-      previousResult: {
-        difficulty: doc.difficulty,
-        diagnosis:  doc.diagnosis,
-        steps:      doc.steps,
-        next_step:  doc.next_step,
-      },
+      previousResult: { difficulty: doc.difficulty, diagnosis: doc.diagnosis, steps: doc.steps, next_step: doc.next_step },
     });
 
     doc.followups.push({ question: question.trim(), answer });
     await doc.save();
-
     res.json({ success: true, answer });
-  } catch (err) {
-    next(err);
-  }
+  } catch (err) { next(err); }
 });
 
 module.exports = router;

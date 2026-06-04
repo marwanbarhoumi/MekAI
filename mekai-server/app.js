@@ -15,6 +15,7 @@ app.use(express.json());
 app.use('/api/auth',    authRouter);
 app.use('/api/diagnose', diagnoseRouter);
 app.use('/api/history',  historyRouter);
+app.use('/api/diagnose', require('./routes/rating'));
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
