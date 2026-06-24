@@ -1,6 +1,67 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const MODELS = [
+  process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
+].filter((m, i, arr) => arr.indexOf(m) === i);
+
+const MAX_RETRIES = 4;
+const BASE_DELAY_MS = 1000;
+
+const getGenAI = () => {
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  if (!apiKey) throw new Error('GEMINI_API_KEY manquant dans .env');
+  return new GoogleGenerativeAI(apiKey);
+};
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const isRetryable = (err) => [429, 500, 503].includes(err?.status);
+const shouldTryNextModel = (err) => [400, 404].includes(err?.status);
+
+const getRetryDelay = (err, attempt) => {
+  const base = err?.status === 429 ? 2000 : BASE_DELAY_MS;
+  return base * 2 ** attempt;
+};
+
+const generateWithFallback = async (content) => {
+  let lastError;
+
+  for (const modelName of MODELS) {
+    const model = getGenAI().getGenerativeModel({ model: modelName });
+
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const result = await model.generateContent(content);
+        if (modelName !== MODELS[0] || attempt > 0) {
+          console.log(`✅ Gemini: ${modelName}${attempt > 0 ? ` (tentative ${attempt + 1})` : ''}`);
+        }
+        return result;
+      } catch (err) {
+        lastError = err;
+
+        if (shouldTryNextModel(err)) {
+          console.warn(`⚠️ ${modelName} non supporté (${err.status}), modèle suivant...`);
+          break;
+        }
+        if (!isRetryable(err)) throw err;
+
+        const delay = getRetryDelay(err, attempt);
+        console.warn(`⚠️ ${modelName} surchargé (${err.status}), nouvel essai dans ${delay}ms...`);
+        await sleep(delay);
+      }
+    }
+
+    if (shouldTryNextModel(lastError)) continue;
+    console.warn(`⚠️ ${modelName} indisponible, passage au modèle suivant...`);
+  }
+
+  const err = new Error('Le service IA est surchargé. Réessayez dans quelques instants.');
+  err.status = 503;
+  throw err;
+};
 
 const LANG_LABEL = { fr: 'français', ar: 'arabe', en: 'anglais' };
 
@@ -19,26 +80,26 @@ FORMAT OBLIGATOIRE :
 difficulty: easy=réparable seul, medium=un peu d'expérience, hard=mécanicien pro requis`;
 
 const diagnose = async ({ problem, lang = 'fr', imageBase64, mimeType }) => {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   const prompt = SYSTEM_PROMPT(lang) + '\n\nProblème: ' + problem;
   const parts = [{ text: prompt }];
   if (imageBase64) {
     parts.push({ inlineData: { mimeType: mimeType || 'image/jpeg', data: imageBase64 } });
   }
-  const result = await model.generateContent(parts);
+
+  const result = await generateWithFallback(parts);
   const raw = result.response.text();
   const clean = raw.replace(/```json|```/g, '').trim();
   return JSON.parse(clean);
 };
 
 const followUp = async ({ question, lang = 'fr', originalProblem, previousResult }) => {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   const prompt = `Tu es MekAI, mécanicien expert. Réponds en ${LANG_LABEL[lang] || 'français'}.
 Problème original: "${originalProblem}"
 Diagnostic: ${JSON.stringify(previousResult)}
 Question: "${question}"
 Réponds courts et pratique, texte simple.`;
-  const result = await model.generateContent(prompt);
+
+  const result = await generateWithFallback(prompt);
   return result.response.text().trim();
 };
 

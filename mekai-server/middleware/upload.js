@@ -16,10 +16,15 @@ const upload = multer({
   },
 });
 
+const isCloudinaryConfigured = () =>
+  !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+
 /**
- * Upload un buffer vers Cloudinary et retourne l'URL publique
+ * Upload un buffer vers Cloudinary et retourne l'URL publique (ou null si non configuré)
  */
 const uploadToCloudinary = (buffer, mimetype) => {
+  if (!isCloudinaryConfigured()) return Promise.resolve(null);
+
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       { folder: 'mekai/diagnostics', transformation: [{ width: 1200, crop: 'limit' }] },
@@ -32,4 +37,4 @@ const uploadToCloudinary = (buffer, mimetype) => {
   });
 };
 
-module.exports = { upload, uploadToCloudinary };
+module.exports = { upload, uploadToCloudinary, isCloudinaryConfigured };

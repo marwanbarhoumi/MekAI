@@ -15,7 +15,8 @@
   "followup_placeholder": "Bloqué sur une étape ? Posez votre question...",
   "send_btn": "Envoyer",
   "new_diagnosis": "Nouveau diagnostic",
-  "error_empty": "Veuillez décrire votre problème.",
+  "error_empty": "Décrivez votre problème ou ajoutez une photo.",
+  "photo_diagnosis": "Diagnostic à partir de la photo",
   "error_network": "Erreur de connexion. Vérifiez votre réseau.",
   "history_title": "Historique"
 }

@@ -15,7 +15,8 @@
   "followup_placeholder": "واجهت صعوبة؟ اسأل هنا...",
   "send_btn": "إرسال",
   "new_diagnosis": "تشخيص جديد",
-  "error_empty": "يرجى وصف المشكلة.",
+  "error_empty": "يرجى وصف المشكلة أو إضافة صورة.",
+  "photo_diagnosis": "تشخيص من الصورة",
   "error_network": "خطأ في الاتصال. تحقق من الإنترنت.",
   "history_title": "السجل"
 }

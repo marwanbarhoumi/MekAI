@@ -22,13 +22,14 @@ export default function DiagnosticForm({ onResult, loading, setLoading }) {
   };
 
   const handleSubmit = async () => {
-    if (!problem.trim()) { setError(t('error_empty')); return; }
+    if (!problem.trim() && images.length === 0) { setError(t('error_empty')); return; }
     setError('');
     setLoading(true);
     try {
       const { diagnose } = await import('../services/api');
-      const result = await diagnose({ problem: problem.trim(), lang: i18n.language, images });
-      onResult(result.data, problem.trim());
+      const submittedProblem = problem.trim() || t('photo_diagnosis');
+      const result = await diagnose({ problem: submittedProblem, lang: i18n.language, images });
+      onResult(result.data, submittedProblem);
     } catch {
       setError(t('error_network'));
     }

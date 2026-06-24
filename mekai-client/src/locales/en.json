@@ -15,7 +15,8 @@
   "followup_placeholder": "Stuck on a step? Ask here...",
   "send_btn": "Send",
   "new_diagnosis": "New diagnosis",
-  "error_empty": "Please describe your problem.",
+  "error_empty": "Describe your problem or add a photo.",
+  "photo_diagnosis": "Diagnosis from photo",
   "error_network": "Connection error. Check your network.",
   "history_title": "History"
 }

@@ -4,29 +4,40 @@ const { upload, uploadToCloudinary } = require('../middleware/upload');
 const claudeService = require('../services/claudeService');
 const Diagnostic = require('../models/Diagnostic');
 
+const PHOTO_ONLY_PROMPT = {
+  fr: 'Analyse la photo du véhicule et diagnostique le problème mécanique visible.',
+  ar: 'حلل صورة المركبة وشخّص المشكلة الميكانيكية الظاهرة.',
+  en: 'Analyze the vehicle photo and diagnose the visible mechanical problem.',
+};
+
 // POST /api/diagnose — supporte jusqu'à 4 photos
 router.post('/', upload.array('images', 4), async (req, res, next) => {
   try {
     const { problem, lang = 'fr', userId = 'anonymous' } = req.body;
-    if (!problem?.trim())
-      return res.status(400).json({ success: false, error: 'Le champ "problem" est requis.' });
+    const hasImages = req.files?.length > 0;
+    const problemText = problem?.trim();
 
-    // Upload toutes les images sur Cloudinary
+    if (!problemText && !hasImages)
+      return res.status(400).json({ success: false, error: 'Décrivez le problème ou ajoutez une photo.' });
+
+    const resolvedProblem = problemText || PHOTO_ONLY_PROMPT[lang] || PHOTO_ONLY_PROMPT.fr;
+
+    // Upload toutes les images sur Cloudinary (si configuré)
     let imageUrls = [];
     let imageBase64 = null;
     let mimeType = null;
 
-    if (req.files?.length > 0) {
-      imageUrls = await Promise.all(
+    if (hasImages) {
+      const uploads = await Promise.all(
         req.files.map(f => uploadToCloudinary(f.buffer, f.mimetype))
       );
-      // On envoie la première image à l'IA
+      imageUrls = uploads.filter(Boolean);
       imageBase64 = req.files[0].buffer.toString('base64');
       mimeType = req.files[0].mimetype;
     }
 
     const result = await claudeService.diagnose({
-      problem: problem.trim(), lang, imageBase64, mimeType,
+      problem: resolvedProblem, lang, imageBase64, mimeType,
     });
 
     // Essayer de sauvegarder dans MongoDB, mais continuer si ça échoue
@@ -34,14 +45,13 @@ router.post('/', upload.array('images', 4), async (req, res, next) => {
     try {
       doc = await Diagnostic.create({
         userId, lang,
-        problem: problem.trim(),
+        problem: problemText || (PHOTO_ONLY_PROMPT[lang] || PHOTO_ONLY_PROMPT.fr),
         imageUrl: imageUrls[0] || null,
         imageUrls,
         ...result,
       });
     } catch (dbErr) {
       console.warn('⚠️  Could not save to database:', dbErr.message);
-      // Créer un faux ID pour la réponse
       doc = { _id: 'temp-' + Date.now() };
     }
 
